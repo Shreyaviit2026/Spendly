@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Terms and Conditions — Spendly{% endblock %}
+
+{% block content %}
+<section class="terms-page">
+    <div class="terms-inner">
+        <h1>Terms and Conditions</h1>
+        <p class="last-updated">Last Updated: August 19, 2026</p>
+
+        <div class="terms-content">
+            <h2>1. Acceptance of Terms</h2>
+            <p>By accessing or using the Spendly application, you agree to be bound by these Terms and Conditions. If you do not agree to all of these terms, please do not use the service.</p>
+
+            <h2>2. Use of Service</h2>
+            <p>Spendly is a personal expense tracking tool. You agree to use the service only for lawful purposes and in a manner that does not infringe the rights of others. You are responsible for maintaining the confidentiality of your account credentials.</p>
+
+            <h2>3. User Data</h2>
+            <p>You retain ownership of the financial data you input into Spendly. We use this data solely to provide the expense tracking features of the application. We do not sell your personal financial data to third parties.</p>
+
+            <h2>4. Limitations of Liability</h2>
+            <p>Spendly is provided "as is" without any warranties. We are not responsible for any financial losses, data loss, or errors resulting from the use of the application. The app is a tool for tracking and not a professional financial advisory service.</p>
+
+            <h2>5. Changes to Terms</h2>
+            <p>We reserve the right to modify these terms at any time. Changes will be effective immediately upon posting to the application. Your continued use of Spendly constitutes acceptance of the updated terms.</p>
+        </div>
+
+        <div class="terms-footer">
+            <a href="{{ url_for('landing') }}" class="btn-ghost">Back to Home</a>
+        </div>
+    </div>
+</section>
+
+<style>
+    .terms-page {
+        padding: 4rem 2rem;
+        display: flex;
+        justify-content: center;
+    }
+    .terms-inner {
+        max-width: 800px;
+        width: 100%;
+        background: var(--paper-card);
+        padding: 3rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        box-shadow: 0 8px 40px rgba(0,0,0,0.06);
+        color: var(--ink);
+        line-height: 1.6;
+    }
+    .terms-inner h1 {
+        font-family: var(--font-display);
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        color: var(--ink);
+    }
+    .last-updated {
+        color: var(--ink-muted);
+        font-size: 0.9rem;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid var(--border-soft);
+        padding-bottom: 1rem;
+    }
+    .terms-content h2 {
+        font-family: var(--font-body);
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        color: var(--ink-soft);
+    }
+    .terms-content p {
+        margin-bottom: 1rem;
+        color: var(--ink-muted);
+    }
+    .terms-footer {
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--border-soft);
+        text-align: center;
+    }
+</style>
+{% endblock %}
