@@ -1,6 +1,20 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, g
+from database.db import get_db
 
 app = Flask(__name__)
+
+
+def get_db_conn():
+    if 'db' not in g:
+        g.db = get_db()
+    return g.db
+
+
+@app.teardown_appcontext
+def teardown_db(exception):
+    db = g.pop('db', None)
+    if db is not None:
+        db.close()
 
 
 # ------------------------------------------------------------------ #
