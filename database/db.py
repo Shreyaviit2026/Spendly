@@ -78,3 +78,17 @@ def seed_db():
             expenses
         )
         conn.commit()
+
+def create_user(name, email, password):
+    """
+    Creates a new user in the database.
+    Password should be hashed before being passed to this function.
+    Returns the ID of the created user.
+    """
+    with get_db() as conn:
+        cursor = conn.execute(
+            "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
+            (name, email, password)
+        )
+        conn.commit()
+        return cursor.lastrowid
