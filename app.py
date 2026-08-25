@@ -1,5 +1,5 @@
 from flask import Flask, render_template, g, request, redirect, url_for, flash, session
-from database.db import get_db, create_user, get_user_by_email
+from database.db import get_db, create_user, get_user_by_email, get_user_by_id
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 import sqlite3
@@ -38,13 +38,15 @@ def login_required(f):
 
 @app.route("/")
 def landing():
+    if "user_id" in session:
+        return redirect(url_for("profile"))
     return render_template("landing.html")
 
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if "user_id" in session:
-        return redirect(url_for("landing"))
+        return redirect(url_for("profile"))
 
     if request.method == "POST":
         name = request.form.get("name")
@@ -80,7 +82,7 @@ def register():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if "user_id" in session:
-        return redirect(url_for("landing"))
+        return redirect(url_for("profile"))
 
     if request.method == "POST":
         email = request.form.get("email")
@@ -128,7 +130,14 @@ def logout():
 @app.route("/profile")
 @login_required
 def profile():
-    return "Profile page — coming in Step 4"
+    user_id = session.get("user_id")
+    user = get_user_by_id(user_id)
+
+    if not user:
+        flash("User profile not found.", "error")
+        return redirect(url_for("login"))
+
+    return render_template("profile.html", user=user)
 
 
 @app.route("/expenses/add")

@@ -104,3 +104,13 @@ def get_user_by_email(email):
             (email,)
         ).fetchone()
 
+def get_user_by_id(user_id):
+    """
+    Retrieves a user record by their user ID.
+    Returns a sqlite3.Row object if found, otherwise None.
+    """
+    with get_db() as conn:
+        return conn.execute(
+            "SELECT * FROM users WHERE id = ?",
+            (user_id,)
+        ).fetchone()

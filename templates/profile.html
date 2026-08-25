@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Your Profile — Spendly{% endblock %}
+
+{% block content %}
+
+<section class="auth-section">
+    <div class="auth-container">
+
+        <div class="auth-header">
+            <h1 class="auth-title">Your Profile</h1>
+            <p class="auth-subtitle">Your account details</p>
+        </div>
+
+        <div class="auth-card">
+            <div class="form-group">
+                <label>Full Name</label>
+                <div class="form-input" style="background-color: var(--bg-input); color: var(--text-main); pointer-events: none;">
+                    {{ user['name'] }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Email Address</label>
+                <div class="form-input" style="background-color: var(--bg-input); color: var(--text-main); pointer-events: none;">
+                    {{ user['email'] }}
+                </div>
+            </div>
+        </div>
+
+        <p class="auth-switch">
+            Need to change your details?
+            <a href="#">Contact support</a>
+        </p>
+
+    </div>
+</section>
+
+{% endblock %}
