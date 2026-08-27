@@ -1,5 +1,4 @@
 import sqlite3
-import os
 
 DATABASE = "spendly.db"
 
@@ -114,3 +113,48 @@ def get_user_by_id(user_id):
             "SELECT * FROM users WHERE id = ?",
             (user_id,)
         ).fetchone()
+
+def get_category_breakdown(user_id):
+    """
+    Retrieves the total spending per category for a given user.
+    Returns a list of sqlite3.Row objects.
+    """
+    with get_db() as conn:
+        return conn.execute(
+            "SELECT category, SUM(amount) as total FROM expenses WHERE user_id = ? GROUP BY category ORDER BY total DESC",
+            (user_id,)
+        ).fetchall()
+
+def get_total_spending(user_id):
+    """
+    Retrieves the total spending for a given user.
+    Returns the total amount as a float.
+    """
+    with get_db() as conn:
+        result = conn.execute(
+            "SELECT SUM(amount) as total FROM expenses WHERE user_id = ?",
+            (user_id,)
+        ).fetchone()
+        return result['total'] if result and result['total'] else 0.0
+
+def get_spending_summary(user_id):
+    """
+    Retrieves the total spending and spending for the current month for a user.
+    Returns a sqlite3.Row object.
+    """
+    with get_db() as conn:
+        return conn.execute(
+            "SELECT SUM(amount) as total_all, SUM(CASE WHEN date >= date('now', 'start of month') THEN amount ELSE 0 END) as total_month FROM expenses WHERE user_id = ?",
+            (user_id,)
+        ).fetchone()
+
+def get_expenses_by_user(user_id):
+    """
+    Retrieves all expenses for a given user, ordered by date descending.
+    Returns a list of sqlite3.Row objects.
+    """
+    with get_db() as conn:
+        return conn.execute(
+            "SELECT * FROM expenses WHERE user_id = ? ORDER BY date DESC",
+            (user_id,)
+        ).fetchall()
