@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics Dashboard — Spendly{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/analytics.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="analytics-container">
+    <h1>Analytics Dashboard</h1>
+
+    <div class="summary-grid">
+        <div class="summary-card">
+            <h3>Total Spending</h3>
+            <p id="total-all" class="summary-value">Loading...</p>
+        </div>
+        <div class="summary-card">
+            <h3>This Month</h3>
+            <p id="total-month" class="summary-value">Loading...</p>
+        </div>
+    </div>
+
+    <div class="breakdown-section">
+        <h2>Category Breakdown</h2>
+        <table class="analytics-table">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Total Spent</th>
+                </tr>
+            </thead>
+            <tbody id="category-breakdown">
+                <tr>
+                    <td colspan="2" class="text-center">Loading categories...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        // Fetch summary data
+        const summaryRes = await fetch('/analytics/summary');
+        const summaryData = await summaryRes.json();
+        document.getElementById('total-all').textContent = `₹${summaryData.total_all.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+        document.getElementById('total-month').textContent = `₹${summaryData.total_month.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+
+        // Fetch category breakdown
+        const catRes = await fetch('/analytics/categories');
+        const catData = await catRes.json();
+        const tbody = document.getElementById('category-breakdown');
+
+        if (catData.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="2" class="text-center">No data available</td></tr>';
+        } else {
+            tbody.innerHTML = '';
+            catData.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${row.category}</td>
+                    <td>₹${row.total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+    } catch (error) {
+        console.error('Error loading analytics data:', error);
+        document.querySelector('.analytics-container').innerHTML += '<p class="error-message">Failed to load analytics data. Please try again later.</p>';
+    }
+});
+</script>
+{% endblock %}

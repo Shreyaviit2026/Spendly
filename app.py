@@ -1,5 +1,5 @@
-from flask import Flask, render_template, g, request, redirect, url_for, flash, session
-from database.db import get_db, create_user, get_user_by_email, get_user_by_id
+from flask import Flask, render_template, g, request, redirect, url_for, flash, session, jsonify
+from database.db import get_db, create_user, get_user_by_email, get_user_by_id, get_spending_summary, get_expenses_by_user, get_category_breakdown
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 import sqlite3
@@ -16,7 +16,7 @@ def get_db_conn():
 
 
 @app.teardown_appcontext
-def teardown_db(exception):
+def teardown_db(_exception):
     db = g.pop('db', None)
     if db is not None:
         db.close()
@@ -115,6 +115,44 @@ def privacy():
     return render_template("privacy.html")
 
 
+@app.route("/expenses")
+@login_required
+def expenses():
+    user_id = session.get("user_id")
+    expenses = get_expenses_by_user(user_id)
+    return render_template("expenses.html", expenses=expenses)
+
+@app.route("/analytics")
+@login_required
+def analytics():
+    return render_template("analytics.html")
+
+@app.route("/analytics/recent")
+@login_required
+def analytics_recent():
+    user_id = session.get("user_id")
+    expenses = get_expenses_by_user(user_id)
+    # Limit to top 5 for the "Recent Transactions" view
+    return jsonify([dict(row) for row in expenses[:5]])
+
+@app.route("/analytics/summary")
+@login_required
+def analytics_summary():
+    user_id = session.get("user_id")
+    summary = get_spending_summary(user_id)
+    return jsonify({
+        "total_all": summary['total_all'] if summary and summary['total_all'] else 0.0,
+        "total_month": summary['total_month'] if summary and summary['total_month'] else 0.0
+    })
+
+@app.route("/analytics/categories")
+@login_required
+def analytics_categories():
+    user_id = session.get("user_id")
+    breakdown = get_category_breakdown(user_id)
+    return jsonify([dict(row) for row in breakdown])
+
+
 # ------------------------------------------------------------------ #
 # Placeholder routes — students will implement these                  #
 # ------------------------------------------------------------------ #
@@ -146,12 +184,12 @@ def add_expense():
 
 
 @app.route("/expenses/<int:id>/edit")
-def edit_expense(id):
+def edit_expense(_id):
     return "Edit expense — coming in Step 8"
 
 
 @app.route("/expenses/<int:id>/delete")
-def delete_expense(id):
+def delete_expense(_id):
     return "Delete expense — coming in Step 9"
 
 
