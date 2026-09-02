@@ -1,0 +1,75 @@
+:root {
+    --profile-filter-bg: var(--bg-secondary, #f8f9fa);
+    --profile-filter-border: var(--border-color, #dee2e6);
+    --profile-filter-text: var(--text-main, #212529);
+    --profile-filter-accent: var(--accent-color, #007bff);
+}
+
+.filter-bar {
+    background-color: var(--profile-filter-bg);
+    border: 1px solid var(--profile-filter-border);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.filter-presets {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.preset-btn {
+    padding: 0.4rem 0.8rem;
+    border: 1px solid var(--profile-filter-border);
+    border-radius: 4px;
+    background: white;
+    color: var(--profile-filter-text);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.preset-btn:hover {
+    border-color: var(--profile-filter-accent);
+    color: var(--profile-filter-accent);
+}
+
+.preset-btn.active {
+    background-color: var(--profile-filter-accent);
+    color: white;
+    border-color: var(--profile-filter-accent);
+}
+
+.custom-range {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.custom-range input[type="date"] {
+    padding: 0.3rem;
+    border: 1px solid var(--profile-filter-border);
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.apply-btn {
+    padding: 0.4rem 1rem;
+    background-color: var(--profile-filter-accent);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: opacity 0.2s ease;
+}
+
+.apply-btn:hover {
+    opacity: 0.9;
+}

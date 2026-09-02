@@ -4,6 +4,7 @@
 
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/analytics.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
 <style>
     .profile-dashboard {
         display: flex;
@@ -145,6 +146,33 @@
         </div>
     </div>
 
+    <div class="filter-bar">
+        <div class="filter-presets">
+            <a href="{{ url_for('profile', preset='this-month') }}"
+               class="preset-btn {{ 'active' if preset == 'this-month' }}">This Month</a>
+            <a href="{{ url_for('profile', preset='last-3-months') }}"
+               class="preset-btn {{ 'active' if preset == 'last-3-months' }}">Last 3 Months</a>
+            <a href="{{ url_for('profile', preset='last-6-months') }}"
+               class="preset-btn {{ 'active' if preset == 'last-6-months' }}">Last 6 Months</a>
+            <a href="{{ url_for('profile') }}"
+               class="preset-btn {{ 'active' if not preset and not date_from }}">All Time</a>
+        </div>
+        <form class="custom-range" method="GET" action="{{ url_for('profile') }}">
+            <input type="date" name="date_from" value="{{ date_from or '' }}" placeholder="From">
+            <input type="date" name="date_to" value="{{ date_to or '' }}" placeholder="To">
+            <button type="submit" class="apply-btn">Apply</button>
+        </form>
+    </div>
+
+    <!-- Analytics Configuration -->
+    <div id="analytics-config"
+         data-summary-url="{{ url_for('analytics_summary') }}"
+         data-recent-url="{{ url_for('analytics_recent') }}"
+         data-category-url="{{ url_for('analytics_categories') }}"
+         style="display: none;">
+    </div>
+
+
     <div class="stats-row">
         <div class="stat-card">
             <div class="stat-label">Total Spent</div>
@@ -191,14 +219,21 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', async () => {
+    const params = new URLSearchParams(window.location.search);
+    const dateFrom = params.get('date_from') || '';
+    const dateTo = params.get('date_to') || '';
+    const queryStr = `?date_from=${dateFrom}&date_to=${dateTo}`;
+
+    const config = document.getElementById('analytics-config').dataset;
+
     try {
         // 1. Fetch Summary
-        const summaryRes = await fetch('/analytics/summary');
+        const summaryRes = await fetch(`${config.summaryUrl}${queryStr}`);
         const summaryData = await summaryRes.json();
         document.getElementById('total-spent').textContent = `₹${(summaryData.total_all || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
 
         // 2. Fetch Recent Transactions (to get count and list)
-        const recentRes = await fetch('/analytics/recent');
+        const recentRes = await fetch(`${config.recentUrl}${queryStr}`);
         const recentData = await recentRes.json();
         document.getElementById('total-transactions').textContent = recentData.length;
 
@@ -220,7 +255,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         // 3. Fetch Category Breakdown
-        const catRes = await fetch('/analytics/categories');
+        const catRes = await fetch(`${config.categoryUrl}${queryStr}`);
         const catData = await catRes.json();
         const catList = document.getElementById('category-list');
 
@@ -230,7 +265,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             catList.innerHTML = '';
 
             // Top Category
-            document.getElementById('top-category').textContent = catData[0].category;
+            document.getElementById('top-category').textContent = catData[0]?.category || 'N/A';
 
             const totalSpending = summaryData.total_all || 1;
 
