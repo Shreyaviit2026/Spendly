@@ -114,16 +114,20 @@ def get_user_by_id(user_id):
             (user_id,)
         ).fetchone()
 
-def get_category_breakdown(user_id):
+def get_category_breakdown(user_id, date_from=None, date_to=None):
     """
-    Retrieves the total spending per category for a given user.
+    Retrieves the total spending per category for a given user, optionally filtered by date.
     Returns a list of sqlite3.Row objects.
     """
     with get_db() as conn:
-        return conn.execute(
-            "SELECT category, SUM(amount) as total FROM expenses WHERE user_id = ? GROUP BY category ORDER BY total DESC",
-            (user_id,)
-        ).fetchall()
+        sql = "SELECT category, SUM(amount) as total FROM expenses WHERE user_id = ?"
+        params = [user_id]
+        if date_from and date_to:
+            sql += " AND date BETWEEN ? AND ?"
+            params.extend([date_from, date_to])
+        sql += " GROUP BY category ORDER BY total DESC"
+        return conn.execute(sql, params).fetchall()
+
 
 def get_total_spending(user_id):
     """
@@ -137,24 +141,31 @@ def get_total_spending(user_id):
         ).fetchone()
         return result['total'] if result and result['total'] else 0.0
 
-def get_spending_summary(user_id):
+def get_spending_summary(user_id, date_from=None, date_to=None):
     """
-    Retrieves the total spending and spending for the current month for a user.
+    Retrieves the total spending and spending for the current month for a user, optionally filtered by date.
     Returns a sqlite3.Row object.
     """
     with get_db() as conn:
-        return conn.execute(
-            "SELECT SUM(amount) as total_all, SUM(CASE WHEN date >= date('now', 'start of month') THEN amount ELSE 0 END) as total_month FROM expenses WHERE user_id = ?",
-            (user_id,)
-        ).fetchone()
+        sql = "SELECT SUM(amount) as total_all, SUM(CASE WHEN date >= date('now', 'start of month') THEN amount ELSE 0 END) as total_month FROM expenses WHERE user_id = ?"
+        params = [user_id]
+        if date_from and date_to:
+            sql += " AND date BETWEEN ? AND ?"
+            params.extend([date_from, date_to])
+        return conn.execute(sql, params).fetchone()
 
-def get_expenses_by_user(user_id):
+
+def get_expenses_by_user(user_id, date_from=None, date_to=None):
     """
-    Retrieves all expenses for a given user, ordered by date descending.
+    Retrieves all expenses for a given user, optionally filtered by date, ordered by date descending.
     Returns a list of sqlite3.Row objects.
     """
     with get_db() as conn:
-        return conn.execute(
-            "SELECT * FROM expenses WHERE user_id = ? ORDER BY date DESC",
-            (user_id,)
-        ).fetchall()
+        sql = "SELECT * FROM expenses WHERE user_id = ? "
+        params = [user_id]
+        if date_from and date_to:
+            sql += "AND date BETWEEN ? AND ? "
+            params.extend([date_from, date_to])
+        sql += "ORDER BY date DESC"
+        return conn.execute(sql, params).fetchall()
+
