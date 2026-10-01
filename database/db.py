@@ -169,3 +169,17 @@ def get_expenses_by_user(user_id, date_from=None, date_to=None):
         sql += "ORDER BY date DESC"
         return conn.execute(sql, params).fetchall()
 
+
+def insert_expense(user_id: int, amount: float, category: str, date: str, description: str) -> int:
+    """
+    Inserts a new expense record for a user.
+    Returns the ID of the created expense.
+    """
+    with get_db() as conn:
+        cursor = conn.execute(
+            "INSERT INTO expenses (user_id, amount, category, description, date) VALUES (?, ?, ?, ?, ?)",
+            (user_id, amount, category, description, date)
+        )
+        conn.commit()
+        return cursor.lastrowid
+
