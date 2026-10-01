@@ -183,3 +183,28 @@ def insert_expense(user_id: int, amount: float, category: str, date: str, descri
         conn.commit()
         return cursor.lastrowid
 
+
+def get_expense_by_id(expense_id, user_id):
+    """
+    Retrieves a single expense record by its ID, scoped to the given user.
+    Returns a dictionary if found, otherwise None.
+    """
+    with get_db() as conn:
+        row = conn.execute(
+            "SELECT * FROM expenses WHERE id = ? AND user_id = ?",
+            (expense_id, user_id)
+        ).fetchone()
+        return dict(row) if row else None
+
+
+def update_expense(expense_id, user_id, amount, category, date, description):
+    """
+    Updates an existing expense record, scoped to the given user.
+    """
+    with get_db() as conn:
+        conn.execute(
+            "UPDATE expenses SET amount = ?, category = ?, date = ?, description = ? WHERE id = ? AND user_id = ?",
+            (amount, category, date, description, expense_id, user_id)
+        )
+        conn.commit()
+

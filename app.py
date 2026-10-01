@@ -1,5 +1,5 @@
-from flask import Flask, render_template, g, request, redirect, url_for, flash, session, jsonify
-from database.db import get_db, create_user, get_user_by_email, get_user_by_id, get_spending_summary, get_expenses_by_user, get_category_breakdown, insert_expense
+from flask import Flask, render_template, g, request, redirect, url_for, flash, session, jsonify, abort
+from database.db import get_db, create_user, get_user_by_email, get_user_by_id, get_spending_summary, get_expenses_by_user, get_category_breakdown, insert_expense, get_expense_by_id, update_expense
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 import sqlite3
@@ -276,9 +276,52 @@ def add_expense():
     return render_template("expenses_add.html")
 
 
-@app.route("/expenses/<int:id>/edit")
-def edit_expense(_id):
-    return "Edit expense — coming in Step 8"
+def validate_expense_data(amount_str, category, date):
+    """
+    Validates expense input data.
+    Returns (is_valid, parsed_amount, error_message).
+    """
+    if not all([amount_str, category, date]):
+        return False, None, "Amount, category, and date are required."
+
+    try:
+        amount = float(amount_str)
+        if amount <= 0:
+            return False, None, "Please enter a valid positive amount."
+        return True, amount, None
+    except ValueError:
+        return False, None, "Please enter a valid positive amount."
+
+
+@app.route("/expenses/<int:id>/edit", methods=["GET", "POST"])
+@login_required
+def edit_expense(id):
+    user_id = session.get("user_id")
+    expense = get_expense_by_id(id, user_id)
+
+    if not expense:
+        abort(404)
+
+    if request.method == "POST":
+        amount_str = request.form.get("amount")
+        category = request.form.get("category")
+        date = request.form.get("date")
+        description = request.form.get("description")
+
+        is_valid, amount, error_message = validate_expense_data(amount_str, category, date)
+        if not is_valid:
+            flash(error_message, "error")
+            return render_template("expenses_edit.html", expense=expense)
+
+        try:
+            update_expense(id, user_id, amount, category, date, description)
+            flash("Expense updated successfully!", "success")
+            return redirect(url_for("profile"))
+        except sqlite3.Error:
+            flash("A database error occurred while updating the expense.", "error")
+            return render_template("expenses_edit.html", expense=expense)
+
+    return render_template("expenses_edit.html", expense=expense)
 
 
 @app.route("/expenses/<int:id>/delete")
