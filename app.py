@@ -1,5 +1,5 @@
 from flask import Flask, render_template, g, request, redirect, url_for, flash, session, jsonify
-from database.db import get_db, create_user, get_user_by_email, get_user_by_id, get_spending_summary, get_expenses_by_user, get_category_breakdown
+from database.db import get_db, create_user, get_user_by_email, get_user_by_id, get_spending_summary, get_expenses_by_user, get_category_breakdown, insert_expense
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 import sqlite3
@@ -243,9 +243,37 @@ def profile():
 
 
 
-@app.route("/expenses/add")
+@app.route("/expenses/add", methods=["GET", "POST"])
+@login_required
 def add_expense():
-    return "Add expense — coming in Step 7"
+    if request.method == "POST":
+        amount_str = request.form.get("amount")
+        category = request.form.get("category")
+        date = request.form.get("date")
+        description = request.form.get("description")
+
+        # Validation
+        if not all([amount_str, category, date]):
+            flash("Amount, category, and date are required.", "error")
+            return render_template("expenses_add.html")
+
+        try:
+            amount = float(amount_str)
+            if amount <= 0:
+                raise ValueError()
+        except ValueError:
+            flash("Please enter a valid positive amount.", "error")
+            return render_template("expenses_add.html")
+
+        try:
+            insert_expense(session["user_id"], amount, category, date, description)
+            flash("Expense added successfully!", "success")
+            return redirect(url_for("expenses"))
+        except sqlite3.Error:
+            flash("A database error occurred while adding the expense. Please try again.", "error")
+            return render_template("expenses_add.html")
+
+    return render_template("expenses_add.html")
 
 
 @app.route("/expenses/<int:id>/edit")
