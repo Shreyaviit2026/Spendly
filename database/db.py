@@ -208,3 +208,15 @@ def update_expense(expense_id, user_id, amount, category, date, description):
         )
         conn.commit()
 
+
+def delete_expense(expense_id, user_id):
+    """
+    Permanently deletes an expense record, scoped to the given user.
+    """
+    with get_db() as conn:
+        conn.execute(
+            "DELETE FROM expenses WHERE id = ? AND user_id = ?",
+            (expense_id, user_id)
+        )
+        conn.commit()
+

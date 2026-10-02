@@ -199,6 +199,7 @@
                         <th>Description</th>
                         <th>Category</th>
                         <th>Amount</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="recent-transactions">
@@ -250,6 +251,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <td>${row.description || 'No description'}</td>
                     <td><span class="cat-badge">${row.category}</span></td>
                     <td>₹${row.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                    <td>
+                        <div style="display:flex; gap: 0.5rem;">
+                            <a href="/expenses/${row.id}/edit" class="btn-edit" style="font-size: 0.8rem; color: var(--accent); font-weight: 500;">Edit</a>
+                            <form method="POST" action="/expenses/${row.id}/delete" style="display:inline" onsubmit="return confirm('Delete this expense?')">
+                                <button type="submit" class="btn-delete">Delete</button>
+                            </form>
+                        </div>
+                    </td>
                 `;
                 transTbody.appendChild(tr);
             });

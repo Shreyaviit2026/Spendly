@@ -464,6 +464,23 @@ a { color: inherit; text-decoration: none; }
 
 .btn-submit:hover { background: var(--accent); }
 
+.btn-delete {
+    background: var(--danger);
+    color: var(--paper);
+    padding: 0.3rem 0.6rem;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: background 0.2s;
+}
+
+.btn-delete:hover {
+    background: #a93226;
+}
+
 .auth-switch {
     text-align: center;
     font-size: 0.875rem;
