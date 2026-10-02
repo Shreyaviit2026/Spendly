@@ -1,5 +1,6 @@
 # 💰 Spendly - Personal Expense Tracker
-app hosted : https://expense-tracker-production-7266.up.railway.app/
+
+**Live Demo:** [https://expense-tracker-production-7266.up.railway.app](https://expense-tracker-production-7266.up.railway.app)
 
 Spendly is a lightweight, secure, and intuitive personal expense tracker designed to help users manage their finances with ease. Built using **Flask**, **SQLite**, and **Vanilla JavaScript**, it provides a seamless experience for logging expenses, tracking spending habits, and analyzing financial data through a clean, modern interface.
 
